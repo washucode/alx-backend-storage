@@ -1,0 +1,8 @@
+// Rejex Filter
+db.school.find(
+    {
+       name: {
+        "$regex": /^Holberton/
+       } 
+    }
+)
