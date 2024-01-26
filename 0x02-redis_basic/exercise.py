@@ -7,6 +7,7 @@ Redis basic exercise
 import redis
 import uuid
 
+
 class Cache:
     """
     Cache class
@@ -25,5 +26,3 @@ class Cache:
         key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
-    
-    
