@@ -7,7 +7,24 @@ Redis basic exercise
 import redis
 import uuid
 from typing import Union, Optional, Callable, Any
+from functools import wraps
 
+
+def count_calls(method: Callable) -> Callable:
+    """
+    Method that takes a single
+    method Callable argument and returns a Callable
+    """
+    key = method.__qualname__
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """
+        Wrapper method
+        """
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+    return wrapper
 
 class Cache:
     """
@@ -20,6 +37,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         Method that stores data to redis
