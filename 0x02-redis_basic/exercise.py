@@ -6,6 +6,7 @@ Redis basic exercise
 
 import redis
 import uuid
+from typing import Union, Optional, Callable, Any
 
 
 class Cache:
@@ -19,31 +20,31 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
-    def store(self, data: bytes) -> str:
+    def store(self, data: Union[str, bytes, int, float]) -> str:
         """
-        Method that generates a random key and stores the input data in Redis
+        Method that stores data to redis
         """
         key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str) -> bytes:
+    def get(self, key: str, fn: Optional[Callable] = None) -> Any:
         """
-        Method that gets the data from Redis
+        Method that gets data from redis
         """
         data = self._redis.get(key)
+        if data is not None and fn:
+            return fn(data)
         return data
 
-    def get_str(self, key: str) -> str:
+    def get_str(self, key: str) -> Union[str, None]:
         """
-        Method that gets the data from Redis
+        Method that converts bytes to str
         """
-        data = self._redis.get(key)
-        return data.decode("utf-8")
+        return self.get(key, fn=lambda x: x.decode('utf-8') if x else None)
 
-    def get_int(self, key: str) -> int:
+    def get_int(self, key: str) -> Union[int, None]:
         """
-        Method that gets the data from Redis
+        Method that converts bytes to int
         """
-        data = self._redis.get(key)
-        return int(data)
+        return self.get(key, fn=lambda x: int(x) if x else None)
